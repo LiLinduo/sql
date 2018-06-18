@@ -1,0 +1,49 @@
+
+//start docker
+open -a Docker
+
+//check versions
+docker --version
+docker-compose --version
+docker-machine --version
+
+// this will create a container containing hello world and output it on your screen
+docker run hello-world
+
+//Start a Dockerized web server. docker will download the nginx container
+//go to http://localhost/ to view the nginx homepage. Because we specified the default HTTP port, 
+//it isn’t necessary to append :80 at the end of the URL.
+docker run -d -p 80:80 --name webserver nginx
+
+//check the containers running already
+docker container ls 
+docker ps  //same as above
+
+$ docker container ls
+$ docker container stop webserver
+$ docker container ls -a  // see all
+$ docker container rm webserver
+$ docker image ls
+$ docker image rm nginx
++++++++++++++++++++++++++++++++++++++++
+
+docker pull sath89/oracle-xe-11g
+
+
+docker info
+
+Along with this, make sure your programs inside the docker container are not writing many/huge files to the file system.
+
+Check your running docker process's space usage size
+
+docker ps -s #may take minutes to return
+or for all containers, even exited
+
+docker ps -as #may take minutes to return
+You can then delete the offending container/s
+
+docker rm <CONTAINER ID>
+Find the possible culprit which may be using gigs of space
+
+docker exec -it <CONTAINER ID> "/bin/sh"
+du -h
