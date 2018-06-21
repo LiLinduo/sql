@@ -815,7 +815,7 @@ about transactions
  
  DML	Data manipulation language
 beginn mit der ersten DML anweisung  INSERT UPDATE DELETE. 
-gemeinsamkeit insert and delete : beziehen sich auf eine Tabelle complette datensatz
+gemeinsamkeit insert and delete : beziehen sich auf eine Tabelle complette datensatz									////
 
 Ende > mit COMMIT oder ROLLBACK /// or when I EXIT or DISCONNECT (CONNECT)
 	or system crash. DDL Anweisung.
@@ -1027,99 +1027,6 @@ DELETE
 
 
 
-# DOCKER 
-
-on docker looks like this
-
-https://oraclespin.com/2018/03/30/docker-installation-of-oracle-database-12c-on-mac/#comment-7630
-https://docs.docker.com/docker-for-mac/install/#install-and-run-docker-for-mac
-
-docker start oracle-xe-11g
-
-
-onespeedvelo ~ $ docker exec -it oracle-xe-11g /bin/bash
-root@64e73c8355df:/# prompt s
-bash: prompt: command not found
-root@64e73c8355df:/# echo $ORACLE_SID
-XE
-root@64e73c8355df:/# sqlplus system/oracle@//localhost:1521/orcl
-
-SQL*Plus: Release 11.2.0.2.0 Production on Tue Jun 12 13:08:26 2018
-
-Copyright (c) 1982, 2011, Oracle.  All rights reserved.
-
-ERROR:
-ORA-12514: TNS:listener does not currently know of service requested in connect
-descriptor
-
-
-Enter user-name: system
-Enter password: oracle
-
-Connected to:
-Oracle Database 11g Express Edition Release 11.2.0.2.0 - 64bit Production
-
-SQL> prompt e         
-e
-SQL> exit
-Disconnected from Oracle Database 11g Express Edition Release 11.2.0.2.0 - 64bit Production
-root@64e73c8355df:/# 
-
-Namespaces
-Much of the macOS file system that is accessible to the user is also available to containers 
-using the -v bind mount syntax. The following command runs a container from an image called r-base 
-and shares the macOS user’s ~/Desktop/ directory as /Desktop in the container.
-
-$ docker run -it -v ~/Desktop:/Desktop r-base bash
-$ docker run -it -v ~/Desktop:/Desktop wnameless/oracle-xe-11g:latest /bin/bash
-
-The user’s ~/Desktop/ directory is now visible in the container as a directory under /.
-
-https://community.toadworld.com/platforms/oracle/w/wiki/11638.using-oracle-database-with-docker-engine
-
-https://stevenfeuersteinonplsql.blogspot.com/2017/05/getting-my-oracle-database-12c-release.html
-
-http://www.siue.edu/~dbock/cmis450/6-relationalmodel.htm
-https://geeksocket.in/blog/oracle-db-xe-docker/
-https://hub.docker.com/r/wnameless/oracle-xe-11g/
-
-
-
-
-onespeedvelo ~ $ docker run -d -t --shm-size=1g -p 1523:1523 -v ~/local-initdb:/etc/entrypoint-initdb.d alexeiled/docker-oracle-xe-11g 
-528115b2e4832102488324966d9d60eb7325f7ba2ac26682a05415adfc9c50db
-
-docker container ls
-
-docker logs -f 528115b2e483
-
-Starting Oracle Net Listener.
-Starting Oracle Database 11g Express Edition instance.
-
-Database init...
-/start.sh: running /etc/entrypoint-initdb.d/constraints.sql
-ERROR:
-ORA-28002: the password will expire within 7 days
-
-
-
-DROP TABLE t_person
-           *
-           End init.
-Oracle started successfully!
-
-(new bash)
-docker exec -it oracle-xe-11g /bin/bash
-echo $ORACLE_SID
-sqlplus system/oracle@//localhost:1521/orcl
-
-
-https://oraclespin.com/2018/03/30/docker-installation-of-oracle-database-12c-on-mac/
-https://hub.docker.com/r/alexeiled/docker-oracle-xe-11g/
-
-https://www.techonthenet.com/oracle/tables/create_table.php
-
-
 
 
 primary key. what we use for , rules
@@ -1259,3 +1166,583 @@ die keinen entsprechen?
 SELECT nachname FROM t_person
 	minus
 SELECT name FROM t_adresse;
+
+more about join
+https://www.techonthenet.com/oracle/joins.php
+
+
+Ein Schlüssel dient in einer relationalen Datenbank dazu, die Tupel (Datensätze) einer 
+Relation (Tabelle) eindeutig zu identifizieren, sie zu nummern. 
+Ein Schlüssel ist dann eine Gruppe von Spalten, die so ausgewählt wird, 
+dass jede Tabellenzeile über den Werten dieser Spaltengruppe eine einmalige 
+Wertekombination hat.
+
+Schlüssel
+Eindeutigkeit
+Definiertheit (Null-Werte)
+Minimalität
+
+CREATE ALTER DROP contain always a COMMIT so it is saved in tha database 
+
+Mehrwertiges attribut
+_name_ -- |student| - ((abschluesse))
+pascal					MSA, FA
+nicolai					REAL FA2 FA2
+
+transforms
+student (_name_)
+abschluss(_ _name_ _,abschluesse)	// fremdschl name und primaer mit abschlusse
+			__________________      // ohne primary def, duplicat und null koennen auftreten 
+										aber zusammen nicht
+
+8.2 SELECT Klausel
+
+SELECT [] *|spaltenliste							// * is here all the columns AND in the sequence used in create table
+FROM datensatzmenge								// spaltenliste ::= spaltenname{,spaltenname}
+;
+
+about the "*", this also can happen and is valid
+INSERT 
+	INTO table (*)
+	VALUES (...);	
+
+with select I have to list all columns, no shortcuts. Or I make a VIEW
+CREATE VIEW viewname
+
+ex these are same but the only way to have a different order is below
+SELECT *
+	FROM t_mensch;
+	
+SELECT id,nachname,vorname
+	FROM t_mensch;		
+	
+SELECT id, id * id , id + 10 , 2+3 // everything valid
+
+SELECT 'DANIEL' 
+FROM t_mensch ;   //creates a table with name DANIE and outputs n times DANIEL
+
++ works only with number - for text use the verkettungsoperator ||
+SELECT 'HERR'||' '||nachname 
+FROM t_mensch ; 
+
+SELECT 'HERR'||' '||nachname AS anrede
+FROM t_mensch ; 
+
+spaltenliste ::= spaltenname|ausdruck [[AS] spaltenlistname-given-by-me] 
+				{,spaltenname |ausdruck [[AS] spaltenlistname-given-by-me] }
+				
+REM gibt es den Nachnamen Lehmann , if so gibt den aus				
+REM DISCTINCT keyword is duplicat frei bezogen auf die angegebenen spalten
+
+SELECT DISTINCT nachname,id  
+	FROM t_mensch;
+	
+SELECT DISCTINCT HERR'||' '||nachname AS anrede
+	FROM t_mensch ; 
+	
+WHERE klausel - es ist eine Zeile Beschraenkung
+so we have select which is the column beschraenkung
+from table beschraenkung and this where is the row beschraenkung
+
+bedingung ::= teilbedingung {[AND|OR|NOT] teilbedingung} // kann True false or null wert haben
+
+ex
+
+SELECT * FROM t_person;
+SELECT * FROM t_adresse;
+
+REM wer wohnt in Berlin?
+REM Ausgabe pid
+
+SELECT pid
+	FROM t_adresse
+	WHERE name = 'BERLIN';
+
+REM wer wohnt in Berlin?
+REM Ausgabe Vorname und Nachname
+
+	SELECT vorname, nachname
+	FROM t_adresse a JOIN t_person p
+	ON (a.pid = p.id)
+	WHERE name = 'BERLIN';
+
+// this one is faster!! becasuse need not look for the column name in all tables
+// but got it already given
+
+	SELECT p.vorname, p.nachname
+	FROM t_adresse a JOIN t_person p
+	ON (a.pid = p.id)
+	WHERE a.name = 'BERLIN';
+	
+	
+the order is 1 FROM, 2 WHERE , 3 SELECT
+ex : this will not work because select is read at last one
+	SELECT p.vorname, p.nachname AS namen
+	FROM t_adresse a JOIN t_person p
+	ON (a.pid = p.id)
+	WHERE namen = 'BERLIN';
+
+REM wohnt KRAUSE in BERLIN?
+REM Antwort :Ja
+REM schreibe die SELECT anweisung
+
+	SELECT p.vorname, p.nachname
+	FROM t_adresse a JOIN t_person p
+	ON (a.pid = p.id)
+	WHERE a.name = 'BERLIN' 
+	AND p.nachname = 'Krause';
+
+REM gib mir alle personen vor-nachname aus die in Berlin und die in Potsdam wohnen
+	
+	SELECT p.vorname, p.nachname
+	FROM t_adresse a JOIN t_person p
+	ON (a.pid = p.id)
+	WHERE a.name = 'BERLIN' 
+	OR a.name = 'Potsdam';
+ 
+ set pagesize 0 // wird alles ausgegeben ohne breaks
+ 
+ Boolean operations with NULL
+AND, OR, NOT return NULL if any operand is NULL.
+
+If A is NULL, then:	
+not A		NULL	If A is unknown, its inverse is also unknown.
+A or false	NULL	“A or false” always has the same value as A – which is unknown.
+A or true	true	“A or true” is always true – A's value doesn't matter.
+A or A		NULL	“A or A” always equals A – which is NULL.
+A and false	false	“A and false” is always false – A's value doesn't matter.
+A and true	NULL	“A and true” always has the same value as A – which is unknown.
+A and A		NULL	“A and A” always equals A – which is NULL.
+
+AND has a higher priority. these two are the same
+
+WHERE a.name = 'Berlin' OR a.name = 'Potsdam' AND nachname ='Krausbart'
+WHERE a.name = 'Berlin' OR (a.name = 'Potsdam' AND nachname ='Krausbart')
+
+order () , NOT, AND, OR
+
+ORDER BY - Klausel
+syntax (only SELECT and FROM sind pflicht, DESC default)
+SELECT column
+	FROM datensatzmenge
+	WHERE bedingung
+	ORDER BY sortierspalten;
+	
+	sortierspalten::= spaltenname|spaltenalias [ASC|DESC]
+					  {,spaltenname|spaltenalias [ASC|DESC]}	
+ SELECT vorname, nachname
+	FROM t_adresse
+	ORDER BY vorname DESC;					  
+					  
+SELECT vorname, nachname
+	FROM t_adresse
+	ORDER BY vorname;					  
+					  				  
+SELECT vorname, nachname
+	FROM t_adresse
+	ORDER BY vorname || nachname;
+	
+SELECT vorname, nachname, [kinderanzahl]   // kinderanzahl muss nicht aber kann da auch selected werden
+	FROM t_adresse
+	ORDER BY kinderanzahl;
+	
+NULL wert ist immer den groessten wert. if sorted DESC it will be the biggest value and will start with NULL if any.
+Sortierung ist prospalte
+
+SELECT name,pid
+FROM t_adresse
+ORDER BY name, pid DESC	 // this will order by name with default ASC, only if name is dupe will again be sorted with pid desc
+	
+	
+8.4 Funktionen	
+funktionsname(parameter {,parameter})	
+					|
+				Rueckgabewert
+				
+–––----–––––––—————						
+	
+ex 
+SELECT nachname, upper(nachname)   // to uppercaps .. lower() to lowercase
+	FROM t_person;	
+	
+SELECT nachname, length(nachname)  // length of string
+	FROM t_person;	
+	
+SELECT nachname
+	FROM t_person
+	WHERE length(nachname)=6
+	ORDER BY length(vorname);	
+	
+SELECT round(3.14159,2), round(3.14159,-2)	// round mathematically 2 digits after comma
+	FROM dual;  //dummy tabelle for computation and testing
+
+functionen fuer Datum Uhrzeit
+SELECT sysdate 			// no parentheses but it is a function specially for Oracle
+	FROM dual;	
+	
+SELECT to_char(sysdate,'DD.MM.YYYY HH24:MI:SS')  //time
+	FROM dual;	
+
+
+GRUPPEN FUNKTION / AGGREGAT FUNKTION / MULTIPLE ROW FUNKTION/ SINGLE ROW FUNKTION
+
+GRUPPEN FUNKTION // ab GROUP BY zu benutzen ex not in WHERE
+MIN()
+MAX()
+SUM()
+AVG()
+COUNT()
+and others like standard abweichung variance etc
+
+SELECT kinderanzahl
+	FROM t_person;
+	
+SELECT min(kinderanzahl),max(kinderanzahl),sum(kinderanzahl),avg(kinderanzahl)
+	FROM t_person;	
+// result here ist zB 4 tables with  0, 6, 17, 3.5	
+// mit worten wird alphabetisch geordnet und kleiner groesser.. a..z 
+
+SELECT count(*), count(nachname) // beide richtig gleiche output
+	FROM t_person 
+	
+	
+SELECT count(*), count(name), count(pid) // output here is difference, NULL wird ignoriert
+	FROM t_adresse 
+	
+SELECT count(kinderanzahl)
+	FROM t_person
+	GROUP BY()					// by group functions is inplicit
+	;	
+	
+8.5 Datensaetze gruppieren
+syntax
+	
+SELECT ...											// 4th
+	FROM ...										// 1st	
+	WHERE ...										// 2nd
+	GROUP BY.... group criteria						// third
+	ORDER BY ...									// 4th
+		;	
+
+gruppenkriterium ::= () | spaltenname {,spaltenname}	
+
+SELECT kinderanzahl
+	FROM t_person; 						// output 6,6,2,1
+	
+SELECT count(kinderanzahl)
+ 	FROM t_person; 						// output 4
+
+SELECT count(kinderanzahl)
+ 	FROM t_person 	
+ 	GROUP BY ();						// output 4 
+ 	
+SELECT count(kinderanzahl)
+ 	FROM t_person 	
+ 	GROUP BY kinderanzahl;				// 2,1,1 (6 occurs two times)
+ 	
+in the WHERE is gruppen funktion verboten weil GROUP BY ist der 4. step
+erst wird from, dann where .. dann kommt GROUP by..
+this means after key words FROM WHERE no group functions allowed!
+
+8.5 Datensaetze gruppieren  	
+
+SELECT vorname, nachname, max(alter_)
+	FROM t_person
+	GROUP BY nachname;
+	
+t_person vorname | nachname | alter_
+			Ina		Krause		18	
+			Bernd	Waldmann	14
+			Gerd	Krause		20
+			
+was passiert here - fehler - warum?
+FROM wird executed
+dann GROUP BY.. nachname. system takes Krause. exist already? no dann eintragen mit vorname Ina
+dann Waldmann .. same, Waldmann wird eingetragen. aber wenn nochmal Krause kommt
+dann system kann nicht unter vorname Gerd eintragen, daher Fehler.
+
+Entweder 	
+SELECT vorname, nachname, max(alter_)
+	FROM t_person
+	GROUP BY nachname,vorname;		
+	
+oder ohne vorname
+	
+SELECT nachname, max(alter_)
+	FROM t_person
+	GROUP BY nachname;	
+	
+REGEL : Wird die GROUP BY klausel verwendet, so darf in der SELECT(HAVING) klausel nur Spalten 
+	verwendet werden:
+	1. die durch den Gruppenausdruck referenziert wird oder
+	2. die zusammen mit einer Gruppenfunktion auftreten 
+
+system check it first. it is semantic, doesnt matter which values are in the tables	
+
+das ist ok
+SELECT kinderanzahl,'Peter'
+	FROM t_person
+ 	GROUP BY kinderanzahl;
+ 	
+8.6
+Syntax
+SELECT ...								//5th
+	FROM ...							//1st
+	WHERE...							//2nd
+	GROUP BY ...	 					//3rd
+	HAVING  Bedingung					//4th
+	ORDER BY ..			;				//6th
+	
+
+SELECT kinderanzahl
+	FROM t_person
+	GROUP BY kinderanzahl	
+	HAVING vorname = 'Tom'; this is a fehler beacuse vorname is in the group by NOT referenced
+
+SELECT kinderanzahl								
+	FROM t_person								// table is  6,6,2,0
+	GROUP BY kinderanzahl						// result is 2,1,1
+	HAVING count(vorname) = length(Tom); 		// means where the same vorname occurs three times at least 
+
+Weitere funktionen
+
+SELECT * FROM t_adresse
+
+REM in welchen Orten wohnen keine Personen
+SELECT name
+	FROM t_adresse
+	WHERE pid = NULL; 				// NULL = NULL will nicht funktionieren weil => NULL
+
+REM in welchen Orten (name) wohnen Personen
+SELECT name
+	FROM t_adresse
+	WHERE pid is NULL; 					// if NULL then vergleich operator has to be 'is'! 
+	
+	
+run repeats the last command 
+/ does the same	
+
+SELECT * FROM t_adresse ;
+
+SELECT count(pid) 
+	FROM t_adresse ;  //it is ok if there is NULL in the column, it will be ignored
+	
+SELECT name,pid,nvl(pid-1)  		//nvl is a function caled null value. if the value is NULL then replaced with -1
+FROM t_adresse ;					//bei nvl muessen beide Parameter vom selben datentyp sein.
+
+SELECT count(pid),count(nvl(pid-1)) 
+FROM t_adresse ;
+
+SELECT name
+	FROM t_adresse
+	WHERE name LIKE 'B%';  						// B% is B* in LINUX command
+												// B_ is B? inLINUX command , one character
+												
+	WHERE name >= 'B' AND name <= 'C';			// both the same .. B is kleiner als Berlin.
+	WHERE name BETWEEN 'B' AND 'C';				// Potsdam ist groesser als C...
+		
+SELECT nvl(name,5), nvl(pid,-1),nvl(pid,'unbekannt')
+	FROM t_adresse;
+	
+8.6
+1-tabellen erstellen
+2-frage dich selber mit dem hobbies ein
+3-trage von einem Nachbarn den Namen und die Hobbys ein
+			(vorname)
+				|	
+_tid_ —————— | 	TN	 |  ——————————((hobby))												
+				|
+			(nachname)									
+
+tn(_tid_ , vorname, nachname)
+hobby(-tid-,hobby)
+		______
+
+		
+WHERE and HAVING
+
+1 - FROM select a few tables with JOIN
+2 - WHERE I select a few rows which interest me
+3 - GROUP BY of the rows selected in WHERE I group the one that I selected in 2
+	we dont have single rows anymore , we havegroups of data, rows
+4 - HAVING . I got the grouped rows and the condition in HAVING will apply to them
+5 - dann SELECT - select a column
+6 - ORDER BY
+
+SELECT vorname, DISTINCT name   ///FELHLER distinct can only once written and has to be after select
+	FROM tabelle; 
+
+SELECT DISTINCT vorname, name   /// distinct can only once written and has to be after select
+	FROM tabelle; 
+
+Grouped data cannot be maniputated again by INSERT UPDATE DELETE (always row related )
+Or I save the result in VIEW and I do an UPDATE on view
+
+ DML	Data manipulation language
+beginn mit der ersten DML anweisung  INSERT UPDATE DELETE. 
+gemeinsamkeit insert and delete : beziehen sich auf eine Tabelle complette datensatz									////
+
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+8.7 unterabfrage
+SUBSELECT	
+
+SELECT ....
+	FROM ....       
+	WHERE spalte operator ( SELECT spalte		//this is the subselect
+					FROM ...	
+					WHERE 	...)
+	;				
+
+Eine unterabfrage wird genau einmal, entweder
+a fuer die gesamte Hauptanfrage oder,
+b fuer jede Zeile der Hauptabfrabe (correlated/korrelierend) ausgefuehrt
+ 					
+	nested SELECT operators // only the main query get semicolon. the second SELECT has to have parenthese				
+	
+	//////////////////////// uebung //// 
+
+REM Gib alle Personen (vornamen und nachnamen) aus, die meht Kinder als RALF MUELLER haben	
+
+
+SELECT vorname, nachname
+	FROM t_person;
+	
+REM Kinderanzahl als Ralf Berlin
+SELECT kinderanzahl
+	FROM t_person
+	WHERE vorname = 'Ralf'
+	AND nachname = 'Berlin';	
+	
+SELECT vorname, nachname
+	FROM t_person
+    WHERE kinderanzahl > (SELECT kinderanzahl
+	                     FROM t_person
+	                     WHERE vorname = 'Ralf'
+	                     AND nachname = 'Berlin')
+	                     ;	
+REM Gib alle Personen (vornamen und nachnamen) aus, die die meisten Kinder haben
+
+SELECT vorname, nachname
+	FROM t_person
+    WHERE kinderanzahl = (SELECT max(kinderanzahl)
+	                      FROM t_person)
+	                     ;
+
+REM without MAX ? with multiple row operators!
+
+SELECT vorname, nachname
+	FROM t_person
+    WHERE kinderanzahl >=ALL (SELECT kinderanzahl
+	                      FROM t_person)
+	                     ;
+
+avoid NULL
+SELECT vorname, nachname
+	FROM t_person
+    WHERE kinderanzahl >=ALL (SELECT nvl(kinderanzahl,-1)
+	                      FROM t_person)
+	                     ;
+
+	Gruppen funktionen ignorieren NULL so max(kinderanzahl)..
+	
+REM same as above but output the names of people which number of kids is not highest	
+	
+SELECT vorname, nachname
+	FROM t_person
+    WHERE kinderanzahl < (SELECT max(kinderanzahl)
+	                      FROM t_person)
+	                     ;	
+REM same without max with ANY!
+	SELECT vorname, nachname
+	FROM t_person
+    WHERE kinderanzahl <ANY (SELECT max(kinderanzahl)
+	                      	FROM t_person)
+	                     ;	                     
+	                     
+REM give out all people with the highest kinder number and lowest
+
+	SELECT vorname, nachname
+	FROM t_person
+    WHERE kinderanzahl = (SELECT max(kinderanzahl)
+	                      FROM t_person) 
+	     OR kinderanzahl = (SELECT MIN(kinderanzahl)
+	                      FROM t_person)                 
+	                     ;
+
+
+	SELECT vorname, nachname
+	FROM t_person
+    WHERE kinderanzahl <=ALL (SELECT kinderanzahl
+	                      	FROM t_person)
+         OR kinderanzahl >=ALL (SELECT nvl(kinderanzahl,-1)
+	                      FROM t_person)
+	                     ;  
+
+SELECT vorname, nachname
+	FROM t_person
+    WHERE kinderanzahl =ANY (SELECT MAX(kinderanzahl)
+	                      FROM t_person 
+	                      UNION
+	                      SELECT MIN(kinderanzahl)
+	                      FROM t_person)                 
+	                     ;	
+
+REM this is with the multiple row operator IN !
+
+SELECT vorname, nachname
+	FROM t_person
+    WHERE kinderanzahl IN (SELECT MAX(kinderanzahl)
+	                      FROM t_person 
+	                      UNION
+	                      SELECT MIN(kinderanzahl)
+	                      FROM t_person)                 
+	                     ;		                     
+	                     
+	                     
+REM gib aus personen mit der 2. hoechste Kinderanzahl
+SELECT vorname, nachname
+	FROM t_person
+    WHERE kinderanzahl = (SELECT MAX(kinderanzahl)
+	                      FROM t_person 
+	                      WHERE kinderanzahl < (SELECT MAX(kinderanzahl)
+	                                           FROM t_person )  )           
+	                     ;		                     
+	                     
+
+REM gib die id name und pid aus
+REM deren id groesser oder gleich als
+REM der Durschnittwert, bebildet ueber die id
+REM der jeweiligen "name" gruppe sind
+
+SELECT id,name,pid 
+    FROM t_adresse aa
+    WHERE id >= (SELECT AVG(id)     
+                FROM t_adresse ai
+                WHERE ai.name = aa.name
+                GROUP BY name);       
+
+ROLLBACK;		                     
+
+REM gib alle personen aus deren adresse bekannt sind
+
+SELECT vorname, nachname
+    FROM t_person p
+    WHERE EXISTS (SELECT pid  /// SELECT PID actually same what it says because I only want to know if the data exists!
+           FROM t_adresse
+           WHERE pid = p.id
+           )
+           ;
+      
+ REM not exist !
+    FROM t_person p
+    WHERE NOT EXISTS (SELECT pid  /// SELECT PID actually same what it says because I only want to know if the data exists!
+           FROM t_adresse
+           WHERE pid = p.id
+           )
+           ;          
+    
+    
+  ex of incrementing automatically 
+  INSERT INTOt_adresse (id,									name, 	pid)  
+  	VALUES 			   ((SELECT max(id)+1 FROM t_adresse), BERN, 3)
