@@ -529,6 +529,10 @@ Ziele:
 		-Vermeidung von anomalien beim Einfuegen aendern und loeschen.
 		-Verringern der Notwendigkeit, Relationen umzustrukturieren.	
 		
+		
+Redundanzen sind doppelte Informationen in einer Datenbank
+Redundazen können mittels der Normalisierung entfernt werden.
+		
 Beispiel		
 Bestellung										   
 _bestellnr_ | anzahl | artikelkode | artikelname | kundenanschrift 
@@ -593,9 +597,12 @@ A relation that is in first normal form (1NF) must meet additional criteria if i
 for second normal form. Specifically: a relation is in 2NF if it is in 1NF and no non-prime attribute is dependent 
 on any proper subset of any candidate key of the relation. A non-prime attribute of a relation is an attribute 
 that is not a part of any candidate key of the relation.
-- wenn sie sich im 1.Normalform fefindet
+- wenn sie sich im 1.Normalform befindet
 - jedes Nichtschluesselattribut ist voll funktional von PK abhaengig. 
 	here sind rechDatum , KdenNr , anzahl, artikelcode , artikelname
+	
+wenn primaer schluessel aus 2 attributen besteht muessen wir uns gedanken machen. Wenn nur einen primaer schluessel
+gibt dann wir sind automatisch in 2.nF	
 
 Put simply, a relation is in 2NF if it is in 1NF and every non-prime attribute of the relation is 
 dependent on the whole of every candidate key.
@@ -642,7 +649,7 @@ transitiv abhängt.
 - Sie sich in 2. NF befindet und - (ich kann eindeutig von primaer auf das attribut schliessen)
 - Jedes Nichtschluesselattribut nicht transitiv vom PK abhaengt
 
-Transitivität - (PK -> B) und (PK - C) => (PK->C) 
+Transitivität - (PK -> A) und (A - B) => (PK->C) 
 					True		true		True
 					true		False		False 	hier the first is a given due to being in 2NF 
 					
@@ -1744,5 +1751,34 @@ SELECT vorname, nachname
     
     
   ex of incrementing automatically 
-  INSERT INTOt_adresse (id,									name, 	pid)  
+  INSERT INTO t_adresse (id,									name, 	pid)  
   	VALUES 			   ((SELECT max(id)+1 FROM t_adresse), BERN, 3)
+  	
+  	
+examples in oraclass
+https://oranswer.files.wordpress.com/2013/12/oracle_hr_schema.jpg
+pswd 
+CONNECT ora1/ora1
+
+1-DESC regions
+SELECT * FROM regions;
+2- gib vor and nachname von jedem Mitarbeiter aus
+3-Welche Mitarbeiter erhalten eine provision commission pct
+4- gib vor und nachname der mitarbeiter zusammen department_name aus
+5-welcher mitarbeiter gehoert zu keiner abteilung?_ 	
+6 gib alle abteilungsnamen zusammen mit den mitarbeiter aus
+7 gib die abteilungs id und die anzahl der mitarbeiter pro abteilung aus
+8 gib den abteilungsnamen und die anzahl der mitarbeiter pro abteilung aus
+9 in welchen abteilung gibt es zahlenmaessig die groesste anzahl an mitarbeiten?
+
+
+
+https://oranswer.wordpress.com/2013/12/29/installing-examples-and-hr-schema/
+
+
+Normal Formen. die letzte ist mit check. kann ich mit ex matr nr den Vorname erschliessen in 2.NF? wenn ja dann ist die dritte nicht erreicht. 
+1Nf Klasse (KNr,vorn,nachn,matrikel nr,kursnr,kursname)
+2.Nf Klasse (KNr,vorn,nachn,matrikel nr,kurs ne=r,kursname)
+3.Nf Klasse (KNr,matrikel nr,kursnr)
+	student (matrikel,vorn,nachn)
+	Kurs (kursnr,kursname )
